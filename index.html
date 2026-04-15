@@ -3,34 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Timer Familier</title>
+    <title>Pet Feeder 1.29</title>  
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #e0e0e0; display: flex; justify-content: center; padding: 20px; }
-        .card { background: #1e1e1e; padding: 25px; border-radius: 12px; width: 380px; text-align: center; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        
-        /* Stats & Contrôles */
-        .stat-grid { display: flex; justify-content: space-around; margin-bottom: 20px; background: #252525; padding: 15px; border-radius: 8px; align-items: center; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background-color: #121212;       
+            background-image: url('background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh;
+            margin: 0; 
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .card { 
+            background: rgba(30, 30, 30, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 25px; 
+            border-radius: 12px; 
+            width: 380px; 
+            text-align: center; 
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7); 
+        }
+
+        .stat-grid { display: flex; justify-content: space-around; margin-bottom: 20px; background: rgba(37, 37, 37, 0.6); padding: 15px; border-radius: 8px; align-items: center; }
         .big-number { font-size: 2.2em; font-weight: bold; color: #00e5ff; line-height: 1; }
-        .label { font-size: 0.7em; color: #888; text-transform: uppercase; margin-bottom: 5px; }
-        .adj-btn { background: #444; color: white; border: none; padding: 2px 8px; cursor: pointer; border-radius: 3px; font-size: 0.9em; margin: 2px; }
-        .adj-btn:hover { background: #555; }
+        .label { font-size: 0.7em; color: #aaa; text-transform: uppercase; margin-bottom: 5px; font-weight: bold; }
+        .slash { font-size: 1.2em; color: #777; margin-left: 2px; }
+        
+        .adj-btn { background: #444; color: white; border: none; padding: 4px 10px; cursor: pointer; border-radius: 4px; font-size: 1em; margin: 0 5px; transition: 0.2s; }
+        .adj-btn:hover { background: #555; color: #00e5ff; }
 
-        /* Timer */
-        #timer { font-size: 2.2em; margin: 10px 0; color: #ffb300; font-family: monospace; }
+        #timer { font-size: 2.2em; margin: 10px 0; color: #ffb300; font-family: monospace; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
         .timer-ctrl { margin-bottom: 20px; }
-        .timer-adj { background: #333; color: #aaa; border: 1px solid #444; padding: 4px 10px; cursor: pointer; border-radius: 4px; font-size: 0.75em; margin: 0 5px; }
+        .timer-adj { background: #333; color: #ccc; border: 1px solid #444; padding: 4px 10px; cursor: pointer; border-radius: 4px; font-size: 0.75em; margin: 0 5px; }
+        .timer-adj:hover { background: #444; color: white; }
 
-        /* Boutons principaux */
-        .main-btn { background: #00e5ff; border: none; padding: 15px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; color: #000; font-size: 1.1em; transition: 0.2s; }
-        .main-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
+        .main-btn { background: #00e5ff; border: none; padding: 15px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; color: #000; font-size: 1.1em; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: 0.2s; }
+        .main-btn:hover { background: #00fff2; transform: translateY(-1px); }
+        .main-btn:active { transform: translateY(1px); }
+        .main-btn:disabled { background: #333; color: #666; cursor: not-allowed; box-shadow: none; transform: none; }
         
         .secondary-btns { display: flex; gap: 10px; margin-top: 15px; }
-        .cancel-btn { background: #444; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; flex: 1; font-size: 0.8em; display: none; }
-        .reset-btn { background: transparent; color: #ff4444; border: 1px solid #ff4444; padding: 8px; border-radius: 4px; cursor: pointer; flex: 1; font-size: 0.8em; }
+        .cancel-btn { background: #444; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; flex: 1; font-size: 0.8em; display: none; transition: 0.2s; }
+        .cancel-btn:hover { background: #555; }
+        .reset-btn { background: transparent; color: #ff4444; border: 1px solid #ff4444; padding: 8px; border-radius: 4px; cursor: pointer; flex: 1; font-size: 0.8em; transition: 0.2s; }
+        .reset-btn:hover { background: rgba(255, 68, 68, 0.1); }
 
-        /* Historique */
-        .history { margin-top: 20px; text-align: left; max-height: 150px; overflow-y: auto; font-size: 0.8em; border-top: 1px solid #333; padding-top: 15px; color: #bbb; }
+        .history { margin-top: 20px; text-align: left; max-height: 150px; overflow-y: auto; font-size: 0.8em; border-top: 1px solid #333; padding-top: 15px; color: #ccc; }
         .history div { padding: 4px 0; border-bottom: 1px solid #252525; }
+        .history::-webkit-scrollbar { width: 6px; }
+        .history::-webkit-scrollbar-track { background: #1e1e1e; }
+        .history::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
     </style>
 </head>
 <body>
@@ -45,7 +79,9 @@
         </div>
         <div>
             <div class="label">Repas</div>
-            <span id="repas" class="big-number">0</span><span class="label">/3</span>
+            <button class="adj-btn" onclick="adjustMeals(-1)">-</button>
+            <span id="repas" class="big-number">0</span><span class="slash">/3</span>
+            <button class="adj-btn" onclick="adjustMeals(1)">+</button>
         </div>
     </div>
 
@@ -97,11 +133,9 @@
     function feed() {
         const now = Date.now();
         if (data.nextFeedTime > now) return;
-
         backup = JSON.parse(JSON.stringify(data));
         data.meals++;
         let timestamp = new Date().toLocaleTimeString('fr-FR');
-        
         if (data.meals >= 3) {
             data.stat++;
             data.meals = 0;
@@ -111,39 +145,36 @@
             data.nextFeedTime = now + (5 * 60 * 60 * 1000);
             data.history.unshift(`🍖 Repas ${data.meals}/3 - ${timestamp}`);
         }
-        save();
-        updateUI();
-        checkTimer();
+        save(); updateUI(); checkTimer();
     }
 
     function adjustStat(val) {
         backup = JSON.parse(JSON.stringify(data));
         data.stat = Math.max(0, data.stat + val);
-        save();
-        updateUI();
+        save(); updateUI();
+    }
+
+    function adjustMeals(val) {
+        backup = JSON.parse(JSON.stringify(data));
+        data.meals = (data.meals + val);
+        if (data.meals < 0) data.meals = 0;
+        if (data.meals > 2) data.meals = 2; 
+        save(); updateUI();
     }
 
     function adjustTimer(ms) {
         const now = Date.now();
-        if (data.nextFeedTime <= now) {
-            data.nextFeedTime = now + ms;
-        } else {
-            data.nextFeedTime += ms;
-        }
-        
+        if (data.nextFeedTime <= now) data.nextFeedTime = now + ms;
+        else data.nextFeedTime += ms;
         if (data.nextFeedTime < now) data.nextFeedTime = 0;
-        
-        save();
-        checkTimer();
+        save(); checkTimer();
     }
 
     function cancelLast() {
         if (!backup) return;
         data = JSON.parse(JSON.stringify(backup));
         backup = null;
-        save();
-        updateUI();
-        checkTimer();
+        save(); updateUI(); checkTimer();
     }
 
     function checkTimer() {
@@ -166,15 +197,11 @@
     function reset() {
         if(confirm("Tout effacer ?")) {
             data = { stat: 0, meals: 0, nextFeedTime: 0, history: [] };
-            backup = null;
-            save();
-            updateUI();
-            checkTimer();
+            backup = null; save(); updateUI(); checkTimer();
         }
     }
 
-    updateUI();
-    checkTimer();
+    updateUI(); checkTimer();
     if (backup) cancelBtn.style.display = 'block';
     setInterval(checkTimer, 1000);
 </script>
