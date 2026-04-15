@@ -3,73 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pet Feeder 1.29</title>  
+    <title>Pet Feeder</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
+
     <style>
         body { 
             font-family: 'Segoe UI', sans-serif; 
-            background-color: #121212;       
-            background-image: url('background.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh;
-            margin: 0; 
-            padding: 20px;
-            box-sizing: border-box;
+            background-color: #121212; 
+            background-image: url('wallpaper.jpg');
+            background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box;
         }
 
         .card { 
-            background: rgba(30, 30, 30, 0.85);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            padding: 25px; 
-            border-radius: 12px; 
-            width: 380px; 
-            text-align: center; 
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.7); 
+            background: rgba(30, 30, 30, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            padding: 25px; border-radius: 12px; width: 400px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7); position: relative;
         }
 
-        .stat-grid { display: flex; justify-content: space-around; margin-bottom: 20px; background: rgba(37, 37, 37, 0.6); padding: 15px; border-radius: 8px; align-items: center; }
-        .big-number { font-size: 2.2em; font-weight: bold; color: #00e5ff; line-height: 1; }
-        .label { font-size: 0.7em; color: #aaa; text-transform: uppercase; margin-bottom: 5px; font-weight: bold; }
-        .slash { font-size: 1.2em; color: #777; margin-left: 2px; }
+        /* Menu de Gestion (Dropdown) */
+        .manage-menu { position: absolute; top: 15px; right: 15px; }
+        .dots-btn { background: none; border: none; color: #888; font-size: 1.5em; cursor: pointer; padding: 0 10px; }
+        .dots-btn:hover { color: #00e5ff; }
         
-        .adj-btn { background: #444; color: white; border: none; padding: 4px 10px; cursor: pointer; border-radius: 4px; font-size: 1em; margin: 0 5px; transition: 0.2s; }
-        .adj-btn:hover { background: #555; color: #00e5ff; }
+        .dropdown-content { 
+            display: none; position: absolute; right: 0; background: #2a2a2a; min-width: 160px; 
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5); z-index: 10; border-radius: 4px; overflow: hidden; border: 1px solid #444;
+        }
+        .dropdown-content button { 
+            color: #eee; padding: 12px 16px; text-decoration: none; display: block; 
+            width: 100%; border: none; background: none; text-align: left; cursor: pointer; font-size: 0.9em;
+        }
+        .dropdown-content button:hover { background: #3d3d3d; color: #00e5ff; }
+        .btn-delete { color: #ff4444 !important; }
 
-        #timer { font-size: 2.2em; margin: 10px 0; color: #ffb300; font-family: monospace; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        /* Onglets Familiers */
+        .pet-selector { margin-bottom: 20px; display: flex; gap: 5px; justify-content: flex-start; overflow-x: auto; padding-bottom: 5px; }
+        .pet-tab { 
+            background: rgba(255,255,255,0.05); color: #888; border: none; padding: 8px 15px; 
+            border-radius: 4px; cursor: pointer; font-size: 0.85em; white-space: nowrap; transition: 0.2s; 
+        }
+        .pet-tab.active { background: #00e5ff; color: #000; font-weight: bold; }
+
+        #petNameDisplay { font-size: 1.6em; font-weight: bold; color: #00e5ff; display: block; margin-bottom: 20px; }
+
+        /* Stats & Timer */
+        .stat-grid { display: flex; justify-content: space-around; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; align-items: center; }
+        .big-number { font-size: 2.2em; font-weight: bold; color: #00e5ff; }
+        .label { font-size: 0.7em; color: #aaa; text-transform: uppercase; font-weight: bold; }
+        .adj-btn { background: #444; color: white; border: none; padding: 4px 12px; cursor: pointer; border-radius: 4px; font-size: 1em; }
+
+        #timer { font-size: 2.8em; margin: 10px 0; color: #ffb300; font-family: monospace; }
         .timer-ctrl { margin-bottom: 20px; }
-        .timer-adj { background: #333; color: #ccc; border: 1px solid #444; padding: 4px 10px; cursor: pointer; border-radius: 4px; font-size: 0.75em; margin: 0 5px; }
-        .timer-adj:hover { background: #444; color: white; }
+        .timer-adj { background: #333; color: #ccc; border: 1px solid #444; padding: 5px 12px; cursor: pointer; border-radius: 4px; font-size: 0.8em; margin: 0 5px; }
 
-        .main-btn { background: #00e5ff; border: none; padding: 15px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; color: #000; font-size: 1.1em; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: 0.2s; }
-        .main-btn:hover { background: #00fff2; transform: translateY(-1px); }
-        .main-btn:active { transform: translateY(1px); }
-        .main-btn:disabled { background: #333; color: #666; cursor: not-allowed; box-shadow: none; transform: none; }
+        .main-btn { background: #00e5ff; border: none; padding: 18px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; color: #000; font-size: 1.2em; }
+        .main-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
         
-        .secondary-btns { display: flex; gap: 10px; margin-top: 15px; }
-        .cancel-btn { background: #444; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; flex: 1; font-size: 0.8em; display: none; transition: 0.2s; }
-        .cancel-btn:hover { background: #555; }
-        .reset-btn { background: transparent; color: #ff4444; border: 1px solid #ff4444; padding: 8px; border-radius: 4px; cursor: pointer; flex: 1; font-size: 0.8em; transition: 0.2s; }
-        .reset-btn:hover { background: rgba(255, 68, 68, 0.1); }
+        .cancel-btn { background: #444; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 15px; display: none; }
 
-        .history { margin-top: 20px; text-align: left; max-height: 150px; overflow-y: auto; font-size: 0.8em; border-top: 1px solid #333; padding-top: 15px; color: #ccc; }
+        .history { margin-top: 25px; text-align: left; max-height: 120px; overflow-y: auto; font-size: 0.8em; border-top: 1px solid #444; padding-top: 15px; color: #bbb; }
         .history div { padding: 4px 0; border-bottom: 1px solid #252525; }
-        .history::-webkit-scrollbar { width: 6px; }
-        .history::-webkit-scrollbar-track { background: #1e1e1e; }
-        .history::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
     </style>
 </head>
 <body>
 
 <div class="card">
+    <div class="manage-menu">
+        <button class="dots-btn" onclick="toggleDropdown()">⋮</button>
+        <div id="myDropdown" class="dropdown-content">
+            <button onclick="addNewPet()">+ Nouveau Familier</button>
+            <button onclick="renamePet()">✎ Renommer ce Familier</button>
+            <button class="btn-delete" onclick="deleteCurrentPet()">🗑 Supprimer ce Familier</button>
+        </div>
+    </div>
+
+    <div class="pet-selector" id="petSelector"></div>
+
+    <span id="petNameDisplay">---</span>
+
     <div class="stat-grid">
         <div>
             <div class="label">Stat</div>
@@ -80,7 +92,7 @@
         <div>
             <div class="label">Repas</div>
             <button class="adj-btn" onclick="adjustMeals(-1)">-</button>
-            <span id="repas" class="big-number">0</span><span class="slash">/3</span>
+            <span id="repas" class="big-number">0</span><span style="color:#555">/3</span>
             <button class="adj-btn" onclick="adjustMeals(1)">+</button>
         </div>
     </div>
@@ -92,118 +104,155 @@
     </div>
 
     <button id="feedBtn" class="main-btn" onclick="feed()" disabled>Initialisation...</button>
-
-    <div class="secondary-btns">
-        <button id="cancelBtn" class="cancel-btn" onclick="cancelLast()">↩ Annuler</button>
-        <button class="reset-btn" onclick="reset()">Reset</button>
-    </div>
+    <button id="cancelBtn" class="cancel-btn" onclick="cancelLast()">↩ Annuler l'action</button>
 
     <div class="history" id="history"><strong>Historique :</strong></div>
 </div>
 
 <script>
-    let data = JSON.parse(localStorage.getItem('familierData')) || { 
-        stat: 0, meals: 0, nextFeedTime: 0, history: [] 
-    };
-    let backup = JSON.parse(localStorage.getItem('familierBackup')) || null;
+    let pets = JSON.parse(localStorage.getItem('petsData')) || [
+        { name: "Familier 1", stat: 0, meals: 0, nextFeedTime: 0, history: [] }
+    ];
+    let activeIndex = parseInt(localStorage.getItem('activePetIndex')) || 0;
+    let backup = null;
 
-    const feedBtn = document.getElementById('feedBtn');
-    const cancelBtn = document.getElementById('cancelBtn');
-    const timerDisplay = document.getElementById('timer');
+    function toggleDropdown() {
+        const dropdown = document.getElementById("myDropdown");
+        dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+    }
 
-    function save() {
-        localStorage.setItem('familierData', JSON.stringify(data));
-        if (backup) {
-            localStorage.setItem('familierBackup', JSON.stringify(backup));
-            cancelBtn.style.display = 'block';
-        } else {
-            localStorage.removeItem('familierBackup');
-            cancelBtn.style.display = 'none';
+    // Fermer le menu si on clique ailleurs
+    window.onclick = function(event) {
+        if (!event.target.matches('.dots-btn')) {
+            document.getElementById("myDropdown").style.display = "none";
         }
     }
 
+    function save() {
+        localStorage.setItem('petsData', JSON.stringify(pets));
+        localStorage.setItem('activePetIndex', activeIndex);
+        renderSelector();
+    }
+
+    function renderSelector() {
+        const selector = document.getElementById('petSelector');
+        selector.innerHTML = '';
+        pets.forEach((pet, index) => {
+            const btn = document.createElement('button');
+            btn.className = `pet-tab ${index === activeIndex ? 'active' : ''}`;
+            btn.innerText = pet.name;
+            btn.onclick = () => { activeIndex = index; backup = null; updateUI(); checkTimer(); save(); };
+            selector.appendChild(btn);
+        });
+    }
+
     function updateUI() {
-        document.getElementById('stat').innerText = data.stat;
-        document.getElementById('repas').innerText = data.meals;
-        const historyDiv = document.getElementById('history');
-        historyDiv.innerHTML = '<strong>Historique :</strong>' + 
-            (data.history.length > 0 ? data.history.map(h => `<div>${h}</div>`).join('') : '<div>Aucun repas.</div>');
+        const pet = pets[activeIndex];
+        document.getElementById('petNameDisplay').innerText = pet.name;
+        document.getElementById('stat').innerText = pet.stat;
+        document.getElementById('repas').innerText = pet.meals;
+        document.getElementById('history').innerHTML = '<strong>Historique :</strong>' + 
+            (pet.history.length > 0 ? pet.history.map(h => `<div>${h}</div>`).join('') : '<div>Aucun repas.</div>');
+        document.getElementById('cancelBtn').style.display = backup ? 'block' : 'none';
     }
 
     function feed() {
+        const pet = pets[activeIndex];
         const now = Date.now();
-        if (data.nextFeedTime > now) return;
-        backup = JSON.parse(JSON.stringify(data));
-        data.meals++;
+        if (pet.nextFeedTime > now) return;
+
+        backup = JSON.parse(JSON.stringify(pets));
+        pet.meals++;
         let timestamp = new Date().toLocaleTimeString('fr-FR');
-        if (data.meals >= 3) {
-            data.stat++;
-            data.meals = 0;
-            data.nextFeedTime = 0;
-            data.history.unshift(`⭐ +1 Stat (${data.stat}) - ${timestamp}`);
+
+        if (pet.meals >= 3) {
+            pet.stat++; pet.meals = 0; pet.nextFeedTime = 0;
+            pet.history.unshift(`⭐ +1 Stat (${pet.stat}) - ${timestamp}`);
         } else {
-            data.nextFeedTime = now + (5 * 60 * 60 * 1000);
-            data.history.unshift(`🍖 Repas ${data.meals}/3 - ${timestamp}`);
+            pet.nextFeedTime = now + (5 * 60 * 60 * 1000);
+            pet.history.unshift(`🍖 Repas ${pet.meals}/3 - ${timestamp}`);
         }
         save(); updateUI(); checkTimer();
     }
 
+    function checkTimer() {
+        const pet = pets[activeIndex];
+        const now = Date.now();
+        const feedBtn = document.getElementById('feedBtn');
+        const timerDisplay = document.getElementById('timer');
+
+        if (pet.nextFeedTime > now) {
+            feedBtn.disabled = true; feedBtn.innerText = "En attente...";
+            const diff = pet.nextFeedTime - now;
+            const h = Math.floor(diff / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            const timeStr = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            timerDisplay.innerText = timeStr;
+            document.title = `[${timeStr}] ${pet.name}`;
+        } else {
+            feedBtn.disabled = false; feedBtn.innerText = "Nourrir";
+            timerDisplay.innerText = "Prêt !";
+            document.title = `✔ Prêt ! - ${pet.name}`;
+        }
+    }
+
+    function addNewPet() {
+        const name = prompt("Nom du nouveau familier ?");
+        if (name) {
+            pets.push({ name: name, stat: 0, meals: 0, nextFeedTime: 0, history: [] });
+            activeIndex = pets.length - 1;
+            save(); updateUI(); checkTimer();
+        }
+    }
+
+    function renamePet() {
+        const newName = prompt("Nouveau nom ?", pets[activeIndex].name);
+        if (newName) {
+            pets[activeIndex].name = newName;
+            save(); updateUI();
+        }
+    }
+
+    function deleteCurrentPet() {
+        if (pets.length <= 1) return alert("Gardez au moins un familier.");
+        if (confirm(`Supprimer ${pets[activeIndex].name} ?`)) {
+            pets.splice(activeIndex, 1);
+            activeIndex = 0;
+            save(); updateUI(); checkTimer();
+        }
+    }
+
     function adjustStat(val) {
-        backup = JSON.parse(JSON.stringify(data));
-        data.stat = Math.max(0, data.stat + val);
+        backup = JSON.parse(JSON.stringify(pets));
+        pets[activeIndex].stat = Math.max(0, pets[activeIndex].stat + val);
         save(); updateUI();
     }
 
     function adjustMeals(val) {
-        backup = JSON.parse(JSON.stringify(data));
-        data.meals = (data.meals + val);
-        if (data.meals < 0) data.meals = 0;
-        if (data.meals > 2) data.meals = 2; 
+        backup = JSON.parse(JSON.stringify(pets));
+        pets[activeIndex].meals = Math.max(0, Math.min(2, pets[activeIndex].meals + val));
         save(); updateUI();
     }
 
     function adjustTimer(ms) {
         const now = Date.now();
-        if (data.nextFeedTime <= now) data.nextFeedTime = now + ms;
-        else data.nextFeedTime += ms;
-        if (data.nextFeedTime < now) data.nextFeedTime = 0;
+        let p = pets[activeIndex];
+        p.nextFeedTime = (p.nextFeedTime <= now ? now : p.nextFeedTime) + ms;
+        if (p.nextFeedTime < now) p.nextFeedTime = 0;
         save(); checkTimer();
     }
 
     function cancelLast() {
-        if (!backup) return;
-        data = JSON.parse(JSON.stringify(backup));
-        backup = null;
-        save(); updateUI(); checkTimer();
-    }
-
-    function checkTimer() {
-        const now = Date.now();
-        if (data.nextFeedTime > now) {
-            feedBtn.disabled = true;
-            feedBtn.innerText = "En attente...";
-            const diff = data.nextFeedTime - now;
-            const h = Math.floor(diff / 3600000);
-            const m = Math.floor((diff % 3600000) / 60000);
-            const s = Math.floor((diff % 60000) / 1000);
-            timerDisplay.innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-        } else {
-            feedBtn.disabled = false;
-            feedBtn.innerText = "Nourrir";
-            timerDisplay.innerText = "Prêt !";
+        if (backup && confirm("Annuler ?")) {
+            pets = JSON.parse(JSON.stringify(backup));
+            backup = null;
+            save(); updateUI(); checkTimer();
         }
     }
 
-    function reset() {
-        if(confirm("Tout effacer ?")) {
-            data = { stat: 0, meals: 0, nextFeedTime: 0, history: [] };
-            backup = null; save(); updateUI(); checkTimer();
-        }
-    }
-
-    updateUI(); checkTimer();
-    if (backup) cancelBtn.style.display = 'block';
     setInterval(checkTimer, 1000);
+    renderSelector(); updateUI(); checkTimer();
 </script>
 
 </body>
