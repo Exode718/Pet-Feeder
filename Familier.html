@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timer Familier</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #e0e0e0; display: flex; justify-content: center; padding: 20px; }
+        .card { background: #1e1e1e; padding: 25px; border-radius: 12px; width: 380px; text-align: center; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        /* Stats & Contrôles */
+        .stat-grid { display: flex; justify-content: space-around; margin-bottom: 20px; background: #252525; padding: 15px; border-radius: 8px; align-items: center; }
+        .big-number { font-size: 2.2em; font-weight: bold; color: #00e5ff; line-height: 1; }
+        .label { font-size: 0.7em; color: #888; text-transform: uppercase; margin-bottom: 5px; }
+        .adj-btn { background: #444; color: white; border: none; padding: 2px 8px; cursor: pointer; border-radius: 3px; font-size: 0.9em; margin: 2px; }
+        .adj-btn:hover { background: #555; }
+
+        /* Timer */
+        #timer { font-size: 2.2em; margin: 10px 0; color: #ffb300; font-family: monospace; }
+        .timer-ctrl { margin-bottom: 20px; }
+        .timer-adj { background: #333; color: #aaa; border: 1px solid #444; padding: 4px 10px; cursor: pointer; border-radius: 4px; font-size: 0.75em; margin: 0 5px; }
+
+        /* Boutons principaux */
+        .main-btn { background: #00e5ff; border: none; padding: 15px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; color: #000; font-size: 1.1em; transition: 0.2s; }
+        .main-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
+        
+        .secondary-btns { display: flex; gap: 10px; margin-top: 15px; }
+        .cancel-btn { background: #444; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; flex: 1; font-size: 0.8em; display: none; }
+        .reset-btn { background: transparent; color: #ff4444; border: 1px solid #ff4444; padding: 8px; border-radius: 4px; cursor: pointer; flex: 1; font-size: 0.8em; }
+
+        /* Historique */
+        .history { margin-top: 20px; text-align: left; max-height: 150px; overflow-y: auto; font-size: 0.8em; border-top: 1px solid #333; padding-top: 15px; color: #bbb; }
+        .history div { padding: 4px 0; border-bottom: 1px solid #252525; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="stat-grid">
+        <div>
+            <div class="label">Stat</div>
+            <button class="adj-btn" onclick="adjustStat(-1)">-</button>
+            <span id="stat" class="big-number">0</span>
+            <button class="adj-btn" onclick="adjustStat(1)">+</button>
+        </div>
+        <div>
+            <div class="label">Repas</div>
+            <span id="repas" class="big-number">0</span><span class="label">/3</span>
+        </div>
+    </div>
+
+    <div id="timer">--:--:--</div>
+    <div class="timer-ctrl">
+        <button class="timer-adj" onclick="adjustTimer(-600000)">- 10m</button>
+        <button class="timer-adj" onclick="adjustTimer(600000)">+ 10m</button>
+    </div>
+
+    <button id="feedBtn" class="main-btn" onclick="feed()" disabled>Initialisation...</button>
+
+    <div class="secondary-btns">
+        <button id="cancelBtn" class="cancel-btn" onclick="cancelLast()">↩ Annuler</button>
+        <button class="reset-btn" onclick="reset()">Reset</button>
+    </div>
+
+    <div class="history" id="history"><strong>Historique :</strong></div>
+</div>
+
+<script>
+    let data = JSON.parse(localStorage.getItem('familierData')) || { 
+        stat: 0, meals: 0, nextFeedTime: 0, history: [] 
+    };
+    let backup = JSON.parse(localStorage.getItem('familierBackup')) || null;
+
+    const feedBtn = document.getElementById('feedBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const timerDisplay = document.getElementById('timer');
+
+    function save() {
+        localStorage.setItem('familierData', JSON.stringify(data));
+        if (backup) {
+            localStorage.setItem('familierBackup', JSON.stringify(backup));
+            cancelBtn.style.display = 'block';
+        } else {
+            localStorage.removeItem('familierBackup');
+            cancelBtn.style.display = 'none';
+        }
+    }
+
+    function updateUI() {
+        document.getElementById('stat').innerText = data.stat;
+        document.getElementById('repas').innerText = data.meals;
+        const historyDiv = document.getElementById('history');
+        historyDiv.innerHTML = '<strong>Historique :</strong>' + 
+            (data.history.length > 0 ? data.history.map(h => `<div>${h}</div>`).join('') : '<div>Aucun repas.</div>');
+    }
+
+    function feed() {
+        const now = Date.now();
+        if (data.nextFeedTime > now) return;
+
+        backup = JSON.parse(JSON.stringify(data));
+        data.meals++;
+        let timestamp = new Date().toLocaleTimeString('fr-FR');
+        
+        if (data.meals >= 3) {
+            data.stat++;
+            data.meals = 0;
+            data.nextFeedTime = 0;
+            data.history.unshift(`⭐ +1 Stat (${data.stat}) - ${timestamp}`);
+        } else {
+            data.nextFeedTime = now + (5 * 60 * 60 * 1000);
+            data.history.unshift(`🍖 Repas ${data.meals}/3 - ${timestamp}`);
+        }
+        save();
+        updateUI();
+        checkTimer();
+    }
+
+    function adjustStat(val) {
+        backup = JSON.parse(JSON.stringify(data));
+        data.stat = Math.max(0, data.stat + val);
+        save();
+        updateUI();
+    }
+
+    function adjustTimer(ms) {
+        const now = Date.now();
+        if (data.nextFeedTime <= now) {
+            data.nextFeedTime = now + ms;
+        } else {
+            data.nextFeedTime += ms;
+        }
+        
+        if (data.nextFeedTime < now) data.nextFeedTime = 0;
+        
+        save();
+        checkTimer();
+    }
+
+    function cancelLast() {
+        if (!backup) return;
+        data = JSON.parse(JSON.stringify(backup));
+        backup = null;
+        save();
+        updateUI();
+        checkTimer();
+    }
+
+    function checkTimer() {
+        const now = Date.now();
+        if (data.nextFeedTime > now) {
+            feedBtn.disabled = true;
+            feedBtn.innerText = "En attente...";
+            const diff = data.nextFeedTime - now;
+            const h = Math.floor(diff / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            timerDisplay.innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        } else {
+            feedBtn.disabled = false;
+            feedBtn.innerText = "Nourrir";
+            timerDisplay.innerText = "Prêt !";
+        }
+    }
+
+    function reset() {
+        if(confirm("Tout effacer ?")) {
+            data = { stat: 0, meals: 0, nextFeedTime: 0, history: [] };
+            backup = null;
+            save();
+            updateUI();
+            checkTimer();
+        }
+    }
+
+    updateUI();
+    checkTimer();
+    if (backup) cancelBtn.style.display = 'block';
+    setInterval(checkTimer, 1000);
+</script>
+
+</body>
+</html>
