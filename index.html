@@ -13,99 +13,169 @@
             background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed;
             display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box;
         }
+        .container { display: flex; align-items: center; position: relative; }
+        
         .card { 
             background: rgba(30, 30, 30, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
             padding: 25px; border-radius: 12px; width: 420px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.7); position: relative;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7); position: relative; z-index: 10;
         }
+
+        #sideImage { 
+            display: none; position: absolute; left: 520px; top: 50%; transform: translateY(-50%);
+            border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); z-index: 5;
+            max-height: 60vh; max-width: 30vw; object-fit: contain;
+        }
+
+        #linksMenu {
+            display: none; position: absolute; right: 520px; top: 50%; transform: translateY(-50%);
+            width: 200px; background: rgba(30, 30, 30, 0.98); padding: 15px; border-radius: 8px;
+            border: 1px solid #444; text-align: left; z-index: 5;
+        }
+        #linksMenu a { color: #00e5ff; display: block; margin-bottom: 12px; text-decoration: none; font-size: 0.95em; font-weight: bold; }
+        #linksMenu a:hover { color: white; }
+
+        .side-btn { 
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: #00e5ff; color: #000; border: none; width: 65px; height: 35px;
+            border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85em; z-index: 11;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .btn-left { left: -90px; }
+        .btn-right { right: -90px; }
+
         .manage-menu { position: absolute; top: 15px; right: 15px; }
         .dots-btn { background: none; border: none; color: #888; font-size: 1.5em; cursor: pointer; padding: 0 10px; }
         .dropdown-content { 
             display: none; position: absolute; right: 0; background: #2a2a2a; min-width: 160px; 
-            box-shadow: 0 8px 16px rgba(0,0,0,0.5); z-index: 10; border-radius: 4px; overflow: hidden; border: 1px solid #444;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5); z-index: 20; border-radius: 4px; overflow: hidden; border: 1px solid #444;
         }
-        .dropdown-content button { 
-            color: #eee; padding: 12px 16px; display: block; width: 100%; border: none; background: none; text-align: left; cursor: pointer; font-size: 0.9em;
-        }
+        .dropdown-content button { color: #eee; padding: 12px 16px; display: block; width: 100%; border: none; background: none; text-align: left; cursor: pointer; }
         .dropdown-content button:hover { background: #3d3d3d; color: #00e5ff; }
-        .btn-delete { color: #ff4444 !important; }
+
         .pet-selector { margin-bottom: 20px; display: flex; gap: 5px; justify-content: flex-start; overflow-x: auto; padding-bottom: 5px; }
-        .pet-tab { 
-            background: rgba(255,255,255,0.05); color: #888; border: none; padding: 8px 15px; 
-            border-radius: 4px; cursor: pointer; font-size: 0.85em; white-space: nowrap; transition: 0.2s; 
-        }
+        .pet-tab { background: rgba(255,255,255,0.05); color: #888; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 0.85em; white-space: nowrap; }
         .pet-tab.active { background: #00e5ff; color: #000; font-weight: bold; }
+
         #petNameDisplay { font-size: 1.6em; font-weight: bold; color: #00e5ff; display: block; margin-bottom: 20px; }
         .stat-grid { display: flex; justify-content: space-around; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; align-items: center; }
         .big-number { font-size: 2.2em; font-weight: bold; color: #00e5ff; }
         .label { font-size: 0.7em; color: #aaa; text-transform: uppercase; font-weight: bold; }
-        .adj-btn { background: #444; color: white; border: none; padding: 4px 12px; cursor: pointer; border-radius: 4px; font-size: 1em; }
+        .adj-btn { background: #444; color: white; border: none; padding: 4px 12px; cursor: pointer; border-radius: 4px; }
+
         #timer { font-size: 2.8em; margin: 10px 0; color: #ffb300; font-family: monospace; }
         .timer-ctrl { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; margin-bottom: 20px; }
-        .timer-adj { background: #333; color: #ccc; border: 1px solid #444; padding: 6px 10px; cursor: pointer; border-radius: 4px; font-size: 0.75em; flex: 1 1 25%; min-width: 60px; }
-        .timer-adj:hover { background: #444; color: white; }
+        .timer-adj { background: #333; color: #ccc; border: 1px solid #444; padding: 6px 10px; cursor: pointer; border-radius: 4px; font-size: 0.75em; flex: 1 1 25%; }
+        
         .main-btn { background: #00e5ff; border: none; padding: 18px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; color: #000; font-size: 1.2em; }
         .main-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
         .cancel-btn { background: #444; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 15px; display: none; }
+
         .history { margin-top: 25px; text-align: left; max-height: 120px; overflow-y: auto; font-size: 0.8em; border-top: 1px solid #444; padding-top: 15px; color: #bbb; }
         .history div { padding: 4px 0; border-bottom: 1px solid #252525; }
     </style>
 </head>
-<body>
+<body onclick="initAudio()">
 
-<div class="card">
-    <div class="manage-menu">
-        <button class="dots-btn" onclick="toggleDropdown()">⋮</button>
-        <div id="myDropdown" class="dropdown-content">
-            <button onclick="addNewPet()">+ Nouveau Familier</button>
-            <button onclick="renamePet()">✎ Renommer ce Familier</button>
-            <button class="btn-delete" onclick="deleteCurrentPet()">🗑 Supprimer ce Familier</button>
-        </div>
+<div class="container">
+    <button class="side-btn btn-left" onclick="toggleLinks()">Liens</button>
+    <div id="linksMenu">
+        <strong style="color: #888; font-size: 0.8em;">OUTILS</strong><br><br>
+        <a href="https://dofusretrotools.com" target="_blank">Retro Tools</a>
+        <a href="https://solomonk.fr" target="_blank">Solomonk</a>
     </div>
-    <div class="pet-selector" id="petSelector"></div>
-    <span id="petNameDisplay">---</span>
-    <div class="stat-grid">
-        <div>
-            <div class="label">Stat</div>
-            <button class="adj-btn" onclick="adjustStat(-1)">-</button>
-            <span id="stat" class="big-number">0</span>
-            <button class="adj-btn" onclick="adjustStat(1)">+</button>
+
+    <div class="card">
+        <div class="manage-menu">
+            <button class="dots-btn" onclick="toggleDropdown()">⋮</button>
+            <div id="myDropdown" class="dropdown-content">
+                <button onclick="addNewPet()">+ Nouveau Familier</button>
+                <button onclick="renamePet()">✎ Renommer ce Familier</button>
+                <button style="color:#ff4444" onclick="deleteCurrentPet()">🗑 Supprimer ce Familier</button>
+            </div>
         </div>
-        <div>
-            <div class="label">Repas</div>
-            <button class="adj-btn" onclick="adjustMeals(-1)">-</button>
-            <span id="repas" class="big-number">0</span><span style="color:#555">/3</span>
-            <button class="adj-btn" onclick="adjustMeals(1)">+</button>
+        <div class="pet-selector" id="petSelector"></div>
+        <span id="petNameDisplay">---</span>
+        <div class="stat-grid">
+            <div>
+                <div class="label">Stat</div>
+                <button class="adj-btn" onclick="adjustStat(-1)">-</button>
+                <span id="stat" class="big-number">0</span>
+                <button class="adj-btn" onclick="adjustStat(1)">+</button>
+            </div>
+            <div>
+                <div class="label">Repas</div>
+                <button class="adj-btn" onclick="adjustMeals(-1)">-</button>
+                <span id="repas" class="big-number">0</span><span style="color:#555">/3</span>
+                <button class="adj-btn" onclick="adjustMeals(1)">+</button>
+            </div>
         </div>
+        <div id="timer">--:--:--</div>
+        <div class="timer-ctrl">
+            <button class="timer-adj" onclick="adjustTimer(-1800000)">-30m</button>
+            <button class="timer-adj" onclick="adjustTimer(-1200000)">-20m</button>
+            <button class="timer-adj" onclick="adjustTimer(-600000)">-10m</button>
+            <button class="timer-adj" onclick="adjustTimer(600000)">+10m</button>
+            <button class="timer-adj" onclick="adjustTimer(1200000)">+20m</button>
+            <button class="timer-adj" onclick="adjustTimer(1800000)">+30m</button>
+        </div>
+        <button id="feedBtn" class="main-btn" onclick="feed()" disabled>Initialisation...</button>
+        <button id="cancelBtn" class="cancel-btn" onclick="cancelLast()">↩ Annuler l'action</button>
+        <div class="history" id="history"><strong>Historique :</strong></div>
     </div>
-    <div id="timer">--:--:--</div>
-    <div class="timer-ctrl">
-        <button class="timer-adj" onclick="adjustTimer(-1800000)">-30m</button>
-        <button class="timer-adj" onclick="adjustTimer(-1200000)">-20m</button>
-        <button class="timer-adj" onclick="adjustTimer(-600000)">-10m</button>
-        <button class="timer-adj" onclick="adjustTimer(600000)">+10m</button>
-        <button class="timer-adj" onclick="adjustTimer(1200000)">+20m</button>
-        <button class="timer-adj" onclick="adjustTimer(1800000)">+30m</button>
-    </div>
-    <button id="feedBtn" class="main-btn" onclick="feed()" disabled>Initialisation...</button>
-    <button id="cancelBtn" class="cancel-btn" onclick="cancelLast()">↩ Annuler l'action</button>
-    <div class="history" id="history"><strong>Historique :</strong></div>
+
+    <button class="side-btn btn-right" onclick="toggleImage()">Runes</button>
+    <img id="sideImage" src="poids.png" alt="Runes">
 </div>
 
 <script>
     let pets = JSON.parse(localStorage.getItem('petsData')) || [{ name: "Familier 1", stat: 0, meals: 0, nextFeedTime: 0, history: [] }];
     let activeIndex = parseInt(localStorage.getItem('activePetIndex')) || 0;
     let backup = null;
+    let alarmPlayed = false;
+    let audioCtx = null;
+
+    function initAudio() {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
 
     function toggleDropdown() {
         const dropdown = document.getElementById("myDropdown");
         dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
     }
 
+    function toggleImage() {
+        const img = document.getElementById("sideImage");
+        const isVisible = img.style.display === "block";
+        img.style.display = isVisible ? "none" : "block";
+        if (!isVisible) document.getElementById("linksMenu").style.display = "none";
+    }
+
+    function toggleLinks() {
+        const menu = document.getElementById("linksMenu");
+        const isVisible = menu.style.display === "block";
+        menu.style.display = isVisible ? "none" : "block";
+        if (!isVisible) document.getElementById("sideImage").style.display = "none";
+    }
+
+    function playAlarm() {
+        if (alarmPlayed || !audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587, audioCtx.currentTime);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        osc.start();
+        setTimeout(() => { osc.stop(); }, 5000);
+        alarmPlayed = true;
+    }
+
     window.onclick = function(event) {
-        if (!event.target.matches('.dots-btn')) {
-            document.getElementById("myDropdown").style.display = "none";
-        }
+        if (!event.target.matches('.dots-btn')) document.getElementById("myDropdown").style.display = "none";
+        initAudio();
     }
 
     function save() {
@@ -121,7 +191,7 @@
             const btn = document.createElement('button');
             btn.className = `pet-tab ${index === activeIndex ? 'active' : ''}`;
             btn.innerText = pet.name;
-            btn.onclick = () => { activeIndex = index; backup = null; updateUI(); checkTimer(); save(); };
+            btn.onclick = () => { activeIndex = index; backup = null; alarmPlayed = false; updateUI(); checkTimer(); save(); };
             selector.appendChild(btn);
         });
     }
@@ -150,6 +220,7 @@
             pet.nextFeedTime = now + (5 * 60 * 60 * 1000);
             pet.history.unshift(`🍖 Repas ${pet.meals}/3 - ${timestamp}`);
         }
+        alarmPlayed = false;
         save(); updateUI(); checkTimer();
     }
 
@@ -167,10 +238,12 @@
             const timeStr = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
             timerDisplay.innerText = timeStr;
             document.title = `[${timeStr}] ${pet.name}`;
+            alarmPlayed = false;
         } else {
             feedBtn.disabled = false; feedBtn.innerText = "Nourrir";
             timerDisplay.innerText = "Prêt !";
             document.title = `✔ Prêt ! - ${pet.name}`;
+            if (pet.nextFeedTime !== 0) playAlarm();
         }
     }
 
@@ -217,6 +290,7 @@
         let p = pets[activeIndex];
         p.nextFeedTime = (p.nextFeedTime <= now ? now : p.nextFeedTime) + ms;
         if (p.nextFeedTime < now) p.nextFeedTime = 0;
+        alarmPlayed = false;
         save(); checkTimer();
     }
 
