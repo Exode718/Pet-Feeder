@@ -74,6 +74,8 @@
         .volume-container { margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .volume-container label { font-size: 0.7em; color: #888; text-transform: uppercase; font-weight: bold; }
         .volume-slider { width: 100px; accent-color: #00e5ff; cursor: pointer; }
+        .test-btn { background: #444; color: #eee; border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.65em; font-weight: bold; }
+        .test-btn:hover { background: #555; }
 
         .history { margin-top: 15px; text-align: left; max-height: 120px; overflow-y: auto; font-size: 0.8em; border-top: 1px solid #444; padding-top: 15px; color: #bbb; }
         .history div { padding: 4px 0; border-bottom: 1px solid #252525; }
@@ -128,8 +130,9 @@
         <button id="cancelBtn" class="cancel-btn" onclick="cancelLast()">↩ Annuler l'action</button>
         
         <div class="volume-container">
-            <label>Volume Bip</label>
+            <label>Volume</label>
             <input type="range" id="volSlider" class="volume-slider" min="0" max="1" step="0.05" value="0.1">
+            <button class="test-btn" onclick="testVolume()">🔊 TEST</button>
         </div>
 
         <div class="history" id="history"><strong>Historique :</strong></div>
@@ -174,6 +177,17 @@
 
     function playAlarm() {
         if (alarmPlayed || !audioCtx) return;
+        beep(5000);
+        alarmPlayed = true;
+    }
+
+    function testVolume() {
+        initAudio();
+        beep(500);
+    }
+
+    function beep(duration) {
+        if (!audioCtx) return;
         const vol = document.getElementById('volSlider').value;
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
@@ -183,8 +197,7 @@
         gain.connect(audioCtx.destination);
         gain.gain.setValueAtTime(parseFloat(vol), audioCtx.currentTime);
         osc.start();
-        setTimeout(() => { osc.stop(); }, 5000);
-        alarmPlayed = true;
+        setTimeout(() => { osc.stop(); }, duration);
     }
 
     window.onclick = function(event) {
